@@ -1,0 +1,21 @@
+﻿package_update: true
+package_upgrade: true
+
+packages:
+  - coreutils
+  - findutils
+  - gawk
+  - jq
+  - tree
+  - wget
+  - curl
+  - zip 
+  - unzip
+  - iputils-ping
+  - iputils-tracepath
+  - vim-full
+  - emacs-nox
+  - sudo
+  - git
+  - python3-pip
+  - ansible

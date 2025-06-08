@@ -1,0 +1,5 @@
+archive/
+work/
+itop-latest.txt
+*.zip
+.env

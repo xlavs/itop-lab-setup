@@ -1,0 +1,66 @@
+x-itop-volumes: &itop-volumes
+  - /opt/itop/app:/app
+  - /opt/itop/var/itop-data:/app/data
+  - /opt/itop/var/itop-log:/app/log
+
+services:
+  itop-db:
+    image: mariadb:11.7.2
+    container_name: itop-db
+    hostname: itop-db
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${ITOP_DB_NAME}
+      MARIADB_USER: ${ITOP_DB_USER}
+      MARIADB_PASSWORD: ${ITOP_DB_PASS}
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./config/mariadb/my.cnf:/etc/mysql/mariadb.conf.d/99-custom.cnf:ro
+    networks:
+      - itop-net
+
+
+  fix-perms:
+    image: webdevops/php-apache:8.1
+    container_name: itop-fix-perms
+    user: root
+    command:
+      - /bin/bash
+      - -exec
+      - |
+        chown -R application:application /app
+        ls -la /app
+    volumes: *itop-volumes
+    networks:
+      - itop-net
+
+  itop-web:
+    build:
+      context: .
+      dockerfile: docker/itop/Dockerfile
+    image: itop-web-image
+    hostname: itop-web
+    container_name: itop-web
+    depends_on:
+      - itop-db
+      - fix-perms
+    environment:
+      WEB_DOCUMENT_ROOT: /app
+    volumes: *itop-volumes
+    ports:
+      - "8080:80"
+    networks:
+      - itop-net
+
+volumes:
+  db-data:
+  itop-data:
+  itop-log:
+  itop-env-production:
+  itop-env-production-build:
+  itop-env-test:
+  itop-env-test-build:
+
+networks:
+  itop-net:
+
